@@ -10,11 +10,13 @@ import static java.lang.String.format;
 
 public class DataObjectManager<T extends DataObject> {
 
+    private final String table;
     private final String keyspace;
     private final Cluster cluster;
     private final JsonCodec<T> codec = (JsonCodec<T>) new JsonCodec<>(DataObject.class);
 
     public DataObjectManager(final String table, final String keyspace) {
+        this.table = table;
         this.keyspace = keyspace;
         this.cluster = Cluster.builder().addContactPoint("127.0.0.1").build();
         CodecRegistry codecRegistry = cluster.getConfiguration().getCodecRegistry();
@@ -31,7 +33,7 @@ public class DataObjectManager<T extends DataObject> {
 
 
     public T get(final UUID _id) {
-        Statement statement = new SimpleStatement(format("SELECT * FROM %s.profiles WHERE id = %s", keyspace, _id));
+        Statement statement = new SimpleStatement(format("SELECT * FROM %s.%s WHERE id = %s", keyspace, table, _id));
         ResultSet set = cluster.connect().execute(statement);
         List<Integer> list = set.one().getList("json", Integer.class);
         byte[] bytes = toByteArray(list);
@@ -42,12 +44,12 @@ public class DataObjectManager<T extends DataObject> {
         ByteBuffer serialized = this.codec.serialize(object, ProtocolVersion.V5);
         String toInsert = Arrays.toString(serialized.array());
         System.out.println(toInsert);
-        Statement statement = new SimpleStatement(format("INSERT INTO %s.profiles (id, json) VALUES (%s, %s)", keyspace, object.get_id(), toInsert));
+        Statement statement = new SimpleStatement(format("INSERT INTO %s.%s (id, json) VALUES (%s, %s)", keyspace, table, object.get_id(), toInsert));
         cluster.connect().execute(statement);
     }
 
     public boolean delete(final UUID _id) {
-        Statement statement = new SimpleStatement(format("DELETE FROM %s.profiles WHERE id = %s", keyspace, _id));
+        Statement statement = new SimpleStatement(format("DELETE FROM %s.%s WHERE id = %s", keyspace, table, _id));
         return cluster.connect().execute(statement).wasApplied();
     }
 
