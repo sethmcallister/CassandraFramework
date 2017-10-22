@@ -9,7 +9,7 @@ class Example extends DataObject {
 ```
 ### Creating a new DataObjectManager
 ```java
-exampleManager = new DataObjectManager("keyspace", "tablename");
+DataObjectManager<Example> exampleManager = new DataObjectManager("keyspace", "tablename");
 ```
 
 ### Inserting a DataObject
