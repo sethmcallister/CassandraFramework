@@ -14,7 +14,7 @@ public class DataObjectManager<T extends DataObject> {
     private final Cluster cluster;
     private final JsonCodec<T> codec = (JsonCodec<T>) new JsonCodec<>(DataObject.class);
 
-    public DataObjectManager(final String keyspace) {
+    public DataObjectManager(final String table, final String keyspace) {
         this.keyspace = keyspace;
         this.cluster = Cluster.builder().addContactPoint("127.0.0.1").build();
         CodecRegistry codecRegistry = cluster.getConfiguration().getCodecRegistry();
@@ -25,7 +25,7 @@ public class DataObjectManager<T extends DataObject> {
         this.cluster.connect().execute(statement);
 
         System.out.println("creating table");
-        Statement statement1 = new SimpleStatement(format("CREATE TABLE IF NOT EXISTS %s.%s (id uuid PRIMARY KEY, json list<int>)", keyspace, "profiles"));
+        Statement statement1 = new SimpleStatement(format("CREATE TABLE IF NOT EXISTS %s.%s (id uuid PRIMARY KEY, json list<int>)", keyspace, table));
         this.cluster.connect().execute(statement1);
     }
 

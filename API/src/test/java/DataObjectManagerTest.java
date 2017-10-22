@@ -11,7 +11,7 @@ public class DataObjectManagerTest {
 
     @Before
     public void before() {
-        this.profileDataObjectManager = new DataObjectManager<>("test");
+        this.profileDataObjectManager = new DataObjectManager<>("test", "test");
     }
 
     @Test
